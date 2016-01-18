@@ -1,0 +1,102 @@
+/*
+Tested on MoleBox Virtualization Solution Ultra v4.5462
+
+00407C33  |.  E8 9CDEFFFF   call 00405AD4                            ; <- Breakpoint
+00407C38  |.  83C4 0C       add esp,0C
+00407C3B  |.  8945 E4       mov [local.7],eax
+00407C3E  |.  50            push eax
+00407C3F  |.  E8 A6380000   call 0040B4EA
+00407C44  |.  8B45 EC       mov eax,[local.5]
+00407C47  |.  8B08          mov ecx,dword ptr [eax]
+00407C49  |.  8B09          mov ecx,dword ptr [ecx]
+00407C4B  |.  894D E0       mov [local.8],ecx
+00407C4E  |.  50            push eax
+00407C4F  |.  51            push ecx
+00407C50  |.  E8 6A390000   call 0040B5BF
+00407C55  |.  59            pop ecx
+00407C56  |.  59            pop ecx
+00407C57  \.  C3            ret
+
+
+00405CAE  |.  FF55 F0       call [local.4]			; <- Breakpoint
+00405CB1  |.  83C4 08       add esp,8
+00405CB4  |.  33C0          xor eax,eax
+00405CB6  |.  8BE5          mov esp,ebp
+00405CB8  |.  5D            pop ebp
+00405CB9  \.  C3            ret
+
+004023C7  |.  E8 031C0000   call 00403FCF	; <- Breakpoint
+004023CC  |.  83C4 0C       add esp,0C
+004023CF  |>  6A FF         push -1
+004023D1  |.  6A FF         push -1
+004023D3  |.  8B55 0C       mov edx,[arg.2]
+004023D6  |.  FF52 70       call dword ptr [edx+70]
+004023D9  |.  33C0          xor eax,eax
+004023DB  |.  5F            pop edi
+004023DC  |.  5E            pop esi
+004023DD  |.  5B            pop ebx
+004023DE  |.  8BE5          mov esp,ebp
+004023E0  |.  5D            pop ebp
+004023E1  \.  C3            ret
+
+004042F7   .  FFE0          jmp eax		; <- Breakpoint
+004042F9   .  5F            pop edi
+004042FA   .  5E            pop esi
+004042FB   .  5B            pop ebx
+004042FC   .  8BE5          mov esp,ebp
+004042FE   .  5D            pop ebp
+004042FF   .  C3            ret
+
+003A0019    FFD0            call eax
+003A001B    BC 88FF1200     mov esp,12FF88
+003A0020    FFE0            jmp eax		; <- Breakpoint
+*/
+
+bc
+find eip, #E8????????83C40C8945E450E8????????8B45EC8B088B09894DE05051E8????????5959C3#
+cmp $RESULT, 0
+je fail
+bp $RESULT
+run
+bc
+sti
+
+find eip, #FF55F083C40833C08BE55DC3#
+cmp $RESULT, 0
+je fail
+bp $RESULT
+run
+bc
+sti
+
+find eip, #E8????????83C40C6AFF6AFF8B550CFF527033C05F5E5B8BE55DC3#
+cmp $RESULT, 0
+je fail
+bp $RESULT
+run
+bc 
+sti
+
+find eip, #FFE05F5E5B8BE55DC3#
+cmp $RESULT, 0
+je fail
+bp $RESULT
+run
+bc
+sti
+
+find eip, #FFD0BC????????FFE0#
+cmp $RESULT, 0
+je fail
+bp $RESULT + 7
+run
+bc
+sti
+
+cmt eip, "<<<-----OEP-----"
+msg "OEP Found!!"
+ret
+
+fail:
+msg "Script failed :("
+ret
